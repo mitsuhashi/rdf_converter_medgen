@@ -360,9 +360,24 @@ class String
   end
 end
 
-params = ARGV.getopts('a:c:d:n:r:s:pu:', 'prefixes', 'names:', 'mgdef:', 'mgsty:', 'mgconso:', 'mgrel:', 'mgsat:', 'pubmed:')
+def help
+  print "Usage: convert_rdf_medgen.rb [options]\n"
+  print "  -p, --prefixes print prefixes\n"
+  print "  -n, --names NAMES.csv to RDF\n"
+  print "  -d, --mgdef convert MGDEF.csv to RDF\n"
+  print "  -s, --mgsty convert MGSTY.csv to RDF\n"
+  print "  -c, --mgconso convert MGCONSO.csv to RDF\n"
+  print "  -r, --mgrel convert MGREL_1.csv and MGREL_2.csv to RDF\n"
+  print "  -a, --mgsat convert MGSAT_1.csv and MGSAT_2.csv to RDF\n"
+  print "  -u, --pubmed convert medgen_pubmed_lnk.txt to RDF\n"
+end
 
-MedGen::MedGenPubMed
+params = ARGV.getopts('ha:c:d:n:r:s:pu:', 'help', 'prefixes', 'names:', 'mgdef:', 'mgsty:', 'mgconso:', 'mgrel:', 'mgsat:', 'pubmed:')
+
+if params["help"] || params["h"]
+  help
+  exit
+end
 MedGen.prefixes if params["prefixes"] || params["p"]
 MedGen::MGDEF.rdf(params["mgdef"]) if params["mgdef"] || params["d"]
 MedGen::NAMES.rdf(params["names"]) if params["names"] || params["n"]
