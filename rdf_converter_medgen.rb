@@ -370,6 +370,7 @@ def help
   print "  -r, --mgrel convert MGREL_1.csv and MGREL_2.csv to RDF\n"
   print "  -a, --mgsat convert MGSAT_1.csv and MGSAT_2.csv to RDF\n"
   print "  -u, --pubmed convert medgen_pubmed_lnk.txt to RDF\n"
+  print "  -h, --help print help\n"
 end
 
 params = ARGV.getopts('ha:c:d:n:r:s:pu:', 'help', 'prefixes', 'names:', 'mgdef:', 'mgsty:', 'mgconso:', 'mgrel:', 'mgsat:', 'pubmed:')
