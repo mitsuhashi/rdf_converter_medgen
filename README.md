@@ -4,7 +4,7 @@ This script converts a MedGen CSV file into RDF turtle.
 
 ## Input files
 
-MedGen source files are available at [here](ftp://ftp.ncbi.nlm.nih.gov/pub/medgen/csv/). medgen_pubmed_link.txt is available at [here](ftp://ftp.ncbi.nlm.nih.gov/pub/medgen/).
+MedGen source files are available at [here](https://ftp.ncbi.nlm.nih.gov/pub/medgen/csv/). medgen_pubmed_link.txt is available at [here](https://ftp.ncbi.nlm.nih.gov/pub/medgen/).
 
 ## Usage
 
