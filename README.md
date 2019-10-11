@@ -1,14 +1,14 @@
 # RDF converter for MedGen
 
-This script convert MedGen csv files into RDF turtle.
+This script converts a MedGen CSV file into RDF turtle.
 
-## Source files
+## Input files
 
 MedGen source files are available at [here](ftp://ftp.ncbi.nlm.nih.gov/pub/medgen/csv/). medgen_pubmed_link.txt is available at [here](ftp://ftp.ncbi.nlm.nih.gov/pub/medgen/).
 
 ## Usage
 
-    Usage: ruby convert_rdf_medgen.rb [options]
+    Usage: ruby convert_rdf_medgen.rb [options] <file>
        -p, --prefixes print prefixes
        -n, --names NAMES.csv to RDF
        -d, --mgdef convert MGDEF.csv to RDF
