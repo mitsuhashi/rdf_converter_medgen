@@ -308,12 +308,18 @@ module MedGen
 
   end
 
+#head -3 medgen_pubmed_lnk.txt
+#
+##UID|CUI|NAME|PMID|
+#2|C0000039|1,2 Dipalmitoylphosphatidylcholine|1520723|
+#2|C0000039|1,2 Dipalmitoylphosphatidylcholine|2157200|
+
   class MedGenPubMed
 
     def self.rdf(file)
       uid2pubmed = []
       File.open(file) do |f|
-        f.gets
+        f.gets # skip the header line
         ary = parse(f.gets)
         uid2pubmed = [ary[0], ary[1], ary[2], [ary[3]]]
         while line = f.gets
@@ -342,7 +348,7 @@ module MedGen
       turtle_str =
         "medgen:#{uid}\n" +
         "  rdfs:seeAlso medgen:#{cui} ;\n" +
-        "  rdfs:label \"#{name}\" ;\n" +
+        "  rdfs:label #{name.inspect} ;\n" +
         "  dct:references #{pmids.join(', ')} .\n\n"
     end
   end
@@ -361,7 +367,7 @@ class String
 end
 
 def help
-  print "Usage: convert_rdf_medgen.rb [options]\n"
+  print "Usage: convert_rdf_medgen.rb [options] <file>\n"
   print "  -p, --prefixes print prefixes\n"
   print "  -n, --names NAMES.csv to RDF\n"
   print "  -d, --mgdef convert MGDEF.csv to RDF\n"
@@ -379,12 +385,20 @@ if params["help"] || params["h"]
   help
   exit
 end
-MedGen.prefixes if params["prefixes"] || params["p"]
-MedGen::MGDEF.rdf(params["mgdef"]) if params["mgdef"] || params["d"]
-MedGen::NAMES.rdf(params["names"]) if params["names"] || params["n"]
-MedGen::MGSTY.rdf(params["mgsty"]) if params["mgsty"] || params["s"]
-MedGen::MGCONSO.rdf(params["mgconso"]) if params["mgconso"] || params["c"]
-MedGen::MGREL.rdf(params["mgrel"]) if params["mgrel"] || params["r"]
-MedGen::MGSAT.rdf(params["mgsat"]) if params["mgsat"] || params["a"]
-MedGen::MedGenPubMed.rdf(params["pubmed"]) if params["pubmed"] || params["u"]
+MedGen.prefixes                            if params["prefixes"]
+MedGen.prefixes                            if params["p"]
+MedGen::MGDEF.rdf(params["mgdef"])         if params["mgdef"]
+MedGen::MGDEF.rdf(params["d"])             if params["d"]
+MedGen::NAMES.rdf(params["names"])         if params["names"] || params["n"]
+MedGen::NAMES.rdf(params["n"])             if params["n"]
+MedGen::MGSTY.rdf(params["mgsty"])         if params["mgsty"]
+MedGen::MGSTY.rdf(params["s"])             if params["s"]
+MedGen::MGCONSO.rdf(params["mgconso"])     if params["mgconso"]
+MedGen::MGCONSO.rdf(params["c"])           if params["c"]
+MedGen::MGREL.rdf(params["mgrel"])         if params["mgrel"]
+MedGen::MGREL.rdf(params["r"])             if params["r"]
+MedGen::MGSAT.rdf(params["mgsat"])         if params["mgsat"]
+MedGen::MGSAT.rdf(params["a"])             if params["a"]
+MedGen::MedGenPubMed.rdf(params["pubmed"]) if params["pubmed"]
+MedGen::MedGenPubMed.rdf(params["u"])      if params["u"]
 
