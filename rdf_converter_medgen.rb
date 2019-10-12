@@ -35,9 +35,10 @@ module MedGen
 
   class NAMES
 
-    def self.rdf(file)
+    def self.rdf(file, prefixes = false)
       File.open(file) do |f|
         f.gets
+        MedGen.prefixes if $prefixes
         while line = f.gets
           ary = parse(line)
           puts construct_turtle(*ary)
@@ -81,6 +82,7 @@ module MedGen
     def self.rdf(file)
       File.open(file) do |f|
         f.gets
+        MedGen.prefixes if $prefixes
         while line = f.gets
           ary = parse(line)
           puts construct_turtle(*ary)
@@ -117,6 +119,7 @@ module MedGen
       hash = {}
       File.open(file) do |f|
         f.gets
+        MedGen.prefixes if $prefixes
         while line = f.gets
           ary = parse(line)
           hash[ary[0]] = {} unless hash.key?(ary[0])
@@ -195,6 +198,7 @@ module MedGen
     def self.rdf(file)
       File.open(file) do |f|
         f.gets
+        MedGen.prefixes if $prefixes
         while line = f.gets
           ary = parse(line)
           puts construct_turtle(*ary)
@@ -226,6 +230,7 @@ module MedGen
     def self.rdf(file)
       File.open(file) do |f|
         f.gets
+        MedGen.prefixes if $prefixes
         while line = f.gets
           ary = parse(line)
           puts construct_turtle(*ary)
@@ -273,6 +278,7 @@ module MedGen
     def self.rdf(file)
       File.open(file) do |f|
         f.gets
+        MedGen.prefixes if $prefixes
         while line = f.gets
           ary = parse(line)
           puts construct_turtle(*ary)
@@ -320,6 +326,7 @@ module MedGen
       uid2pubmed = []
       File.open(file) do |f|
         f.gets # skip the header line
+        MedGen.prefixes if $prefixes
         ary = parse(f.gets)
         uid2pubmed = [ary[0], ary[1], ary[2], [ary[3]]]
         while line = f.gets
@@ -369,14 +376,14 @@ end
 def help
   print "Usage: convert_rdf_medgen.rb [options] <file>\n"
   print "  -p, --prefixes print prefixes\n"
-  print "  -n, --names NAMES.csv to RDF\n"
-  print "  -d, --mgdef convert MGDEF.csv to RDF\n"
-  print "  -s, --mgsty convert MGSTY.csv to RDF\n"
-  print "  -c, --mgconso convert MGCONSO.csv to RDF\n"
-  print "  -r, --mgrel convert MGREL_1.csv and MGREL_2.csv to RDF\n"
-  print "  -a, --mgsat convert MGSAT_1.csv and MGSAT_2.csv to RDF\n"
-  print "  -u, --pubmed convert medgen_pubmed_lnk.txt to RDF\n"
-  print "  -h, --help print help\n"
+  print "  -n, --names    convert NAMES.csv to RDF\n"
+  print "  -d, --mgdef    convert MGDEF.csv to RDF\n"
+  print "  -s, --mgsty    convert MGSTY.csv to RDF\n"
+  print "  -c, --mgconso  convert MGCONSO.csv to RDF\n"
+  print "  -r, --mgrel    convert MGREL_1.csv and MGREL_2.csv to RDF\n"
+  print "  -a, --mgsat    convert MGSAT_1.csv and MGSAT_2.csv to RDF\n"
+  print "  -u, --pubmed   convert medgen_pubmed_lnk.txt to RDF\n"
+  print "  -h, --help     print help\n"
 end
 
 params = ARGV.getopts('ha:c:d:n:r:s:pu:', 'help', 'prefixes', 'names:', 'mgdef:', 'mgsty:', 'mgconso:', 'mgrel:', 'mgsat:', 'pubmed:')
@@ -385,11 +392,12 @@ if params["help"] || params["h"]
   help
   exit
 end
-MedGen.prefixes                            if params["prefixes"]
-MedGen.prefixes                            if params["p"]
+
+$prefixes = true                           if params["prefixes"]
+$prefixes = true                           if params["p"]
 MedGen::MGDEF.rdf(params["mgdef"])         if params["mgdef"]
 MedGen::MGDEF.rdf(params["d"])             if params["d"]
-MedGen::NAMES.rdf(params["names"])         if params["names"] || params["n"]
+MedGen::NAMES.rdf(params["names"])         if params["names"]
 MedGen::NAMES.rdf(params["n"])             if params["n"]
 MedGen::MGSTY.rdf(params["mgsty"])         if params["mgsty"]
 MedGen::MGSTY.rdf(params["s"])             if params["s"]
@@ -401,4 +409,3 @@ MedGen::MGSAT.rdf(params["mgsat"])         if params["mgsat"]
 MedGen::MGSAT.rdf(params["a"])             if params["a"]
 MedGen::MedGenPubMed.rdf(params["pubmed"]) if params["pubmed"]
 MedGen::MedGenPubMed.rdf(params["u"])      if params["u"]
-
