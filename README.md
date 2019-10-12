@@ -19,3 +19,9 @@ MedGen source files are available at [here](https://ftp.ncbi.nlm.nih.gov/pub/med
        -u, --pubmed convert medgen_pubmed_lnk.txt to RDF
        -h, --help print help
 
+    All options otherwise -p can be set exclusively. Only -p option can be used with other option.
+
+    Example:
+       ruby rdf_coverter_medgen -p -d MGDEF.csv > mgdef.ttl
+
+
