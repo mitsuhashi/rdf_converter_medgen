@@ -10,7 +10,7 @@ module MedGen
     "skos" => "<http://www.w3.org/2004/02/skos/core#>",
     "prov" => "<http://www.w3.org/ns/prov#>",
     "pav" => "<http://purl.org/pav/>",
-    "medgen" => "<https://www.ncbi.nlm.nih.gov/medgen/>",
+    "medgen" => "<http://www.ncbi.nlm.nih.gov/medgen/>",
     "mo" => "<http://med2rdf/ontology/medgen#>",
     "ispref" => "<http://med2rdf/ontology/medgen/ispref#>",
     "sty" => "<http://purl.bioontology.org/ontology/STY/>",
