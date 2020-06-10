@@ -21,8 +21,7 @@ module MedGen
     "nci" => "<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#>",
     "dct" => "<http://purl.org/dc/terms/>",
     "pubmedid" => "<http://identifiers.org/pubmed/>",
-    "pubmed" => "<http://rdf.ncbi.nlm.nih.gov/pubmed/>",
-    "mondo" => "<http://purl.obolibrary.org/obo/MONDO_>"
+    "pubmed" => "<http://rdf.ncbi.nlm.nih.gov/pubmed/>"
   }
 
   def prefixes
@@ -153,7 +152,6 @@ module MedGen
     end
 
     def self.parse(line)
-      STDERR.print "#{line}\n"
       if /^(\w+),(\w+),(\w+),(\w+),(\w+),(\S*),(\S*),(\S*),(\w+),(\w+),(.+?),\"(.+)\",(\w)[\r\n]*?$/ =~ line
         [$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13]
       elsif /^(\w+),(\w+),(\w+),(\w+),(\w+),(\S*),(\S*),(\S*),(\w+),(\w+),(.+?),\"(.+\",[\w\s]+?)[\r\n]+$/ =~ line
@@ -162,8 +160,6 @@ module MedGen
         [$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, "N"]
       elsif /^(\w+),(\w+),(\w+),(\w+),(\w+),(\S*),(\S*),(\S*),(\w+),(\w+),(.?),\"\",\w[\r\n]+$/ =~ line
         [$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, "", "N"]
-#C1838606,P,PF,Y,AN1494134,,GTRT000000359,MONDO:0010825,MONDO,PT,MONDO_0010825,"atrioventricular defect-blepharophimosis-radial and anal defect syndrome",N
-#C1838604,P,PF,Y,AN1497381,,GTRT000001166,MONDO:0020759,MONDO,PT,MONDO_0020759,"",N
       else
         raise "Parse error on MGCONSO.\n"
       end
