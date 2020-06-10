@@ -21,7 +21,8 @@ module MedGen
     "nci" => "<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#>",
     "dct" => "<http://purl.org/dc/terms/>",
     "pubmedid" => "<http://identifiers.org/pubmed/>",
-    "pubmed" => "<http://rdf.ncbi.nlm.nih.gov/pubmed/>"
+    "pubmed" => "<http://rdf.ncbi.nlm.nih.gov/pubmed/>",
+    "mondo" => "<http://purl.obolibrary.org/obo/MONDO_>"
   }
 
   def prefixes
@@ -142,6 +143,8 @@ module MedGen
               puts construct_turtle(*ary, :nci)
             when "SNOMEDCT_US"
               puts construct_turtle(*ary, :snomedct_us)
+            when "MONDO"
+              puts construct_turtle(*ary, :mondo)
             else
             end
           end
@@ -174,6 +177,9 @@ module MedGen
       when :nci
         turtle_ary << "  rdfs:seeAlso nci:#{scui} ;\n"
       when :snomedct_us
+      when :mondo
+        /MONDO:(\d+)$/ =~ scui
+        turtle_ary << "  rdfs:seeAlso mondo:#{$1} ;\n"
       when :other
       else
       end
