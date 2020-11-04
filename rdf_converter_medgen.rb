@@ -21,7 +21,8 @@ module MedGen
     "nci" => "<http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#>",
     "dct" => "<http://purl.org/dc/terms/>",
     "pubmedid" => "<http://identifiers.org/pubmed/>",
-    "pubmed" => "<http://rdf.ncbi.nlm.nih.gov/pubmed/>"
+    "pubmed" => "<http://rdf.ncbi.nlm.nih.gov/pubmed/>",
+    "snomedct" => "<http://purl.bioontology.org/ontology/SNOMEDCT/>"
   }
 
   def prefixes
@@ -122,30 +123,25 @@ module MedGen
         MedGen.prefixes if $prefixes
         while line = f.gets
           ary = parse(line)
-          hash[ary[0]] = {} unless hash.key?(ary[0])
-          if hash[ary[0]].key?(ary[8])
-            puts construct_turtle(*ary, :other)
+          # ary[8] describes an abbreviation for the source of the term (Defined in MedGen_Sources.txt)
+          case ary[8]
+          when "GTR"
+            puts construct_turtle(*ary, :gtr)
+          when "HPO"
+            puts construct_turtle(*ary, :hpo)
+          when "MSH"
+            puts construct_turtle(*ary, :msh)
+          when "OMIM"
+            puts construct_turtle(*ary, :omim)
+          when "ORDO"
+            puts construct_turtle(*ary, :ordo)
+          when "NCI"
+            puts construct_turtle(*ary, :nci)
+          when "SNOMEDCT_US"
+            puts construct_turtle(*ary, :snomedct_us)
+          when "MONDO"
+            puts construct_turtle(*ary, :mondo)
           else
-            hash[ary[0]][ary[8]] = {}
-            case ary[8]
-            when "GTR"
-              puts construct_turtle(*ary, :gtr)
-            when "HPO"
-              puts construct_turtle(*ary, :hpo)
-            when "MSH"
-              puts construct_turtle(*ary, :msh)
-            when "OMIM"
-              puts construct_turtle(*ary, :omim)
-            when "ORDO"
-              puts construct_turtle(*ary, :ordo)
-            when "NCI"
-              puts construct_turtle(*ary, :nci)
-            when "SNOMEDCT_US"
-              puts construct_turtle(*ary, :snomedct_us)
-            when "MONDO"
-              puts construct_turtle(*ary, :mondo)
-            else
-            end
           end
         end
       end
@@ -168,27 +164,6 @@ module MedGen
     def self.construct_turtle(cui, ts, stt, ispref, aui, saui,
                               scui, sdui, sab, tty, code, str, supress, flag)
       turtle_ary = ["medgen:#{cui}\n"]
-      case flag
-      when :hpo
-        /HP\:(\d+)/ =~ sdui
-        hp_id = $1
-        turtle_ary << "  rdfs:seeAlso obo:HP_#{$1} ;\n"
-      when :msh
-        turtle_ary << "  rdfs:seeAlso mesh:#{sdui} ;\n"
-      when :omim
-        turtle_ary << "  rdfs:seeAlso omim:#{sdui} ;\n"
-      when :ordo
-        turtle_ary << "  rdfs:seeAlso ordo:#{sdui} ;\n"
-      when :nci
-        turtle_ary << "  rdfs:seeAlso nci:#{scui} ;\n"
-      when :snomedct_us
-      when :mondo
-#        /MONDO\:(\d+)$/ =~ sdui
-#        mondo_id = $1
-        turtle_ary << "  rdfs:seeAlso obo:#{code} ;\n"
-      when :other
-      else
-      end
 
       turtle_ary << 
         "  mo:mgconso [\n" <<
@@ -198,9 +173,33 @@ module MedGen
         "    mo:ispref ispref:#{ispref} ;\n" <<
         "    mo:aui \"#{aui}\" ;\n" <<
         "    dct:source mo:#{sab.remove_space} ;\n" <<
-        "    mo:supress mo:#{supress}\n" <<
+        "    mo:supress mo:#{supress}\n"
+
+      case flag
+      when :hpo
+        /HP\:(\d+)/ =~ sdui
+        hp_id = $1
+        turtle_ary << "    rdfs:seeAlso obo:HP_#{$1} ;\n"
+      when :msh
+        turtle_ary << "    rdfs:seeAlso mesh:#{sdui} ;\n"
+      when :omim
+        turtle_ary << "    rdfs:seeAlso omim:#{sdui} ;\n"
+      when :ordo
+        turtle_ary << "    rdfs:seeAlso ordo:#{sdui} ;\n"
+      when :nci
+        turtle_ary << "    rdfs:seeAlso nci:#{scui} ;\n"
+      when :snomedct_us
+        turtle_ary << "    rdfs:seeAlso snomedct:#{scui} ;\n"
+      when :mondo
+        turtle_ary << "    rdfs:seeAlso obo:#{code} ;\n"
+      when :other
+      else
+      end
+
+      turtle_ary << 
         "  ] .\n" <<
         "\n"
+
       turtle_str = turtle_ary.join("")
     end
   end
