@@ -123,7 +123,8 @@ module MedGen
         MedGen.prefixes if $prefixes
         while line = f.gets
           ary = parse(line)
-          # ary[8] describes an abbreviation for the source of the term (Defined in MedGen_Sources.txt)
+          # ary[8] describes an abbreviation for the source of the term
+          # (Defined in MedGen_Sources.txt)
           case ary[8]
           when "GTR"
             puts construct_turtle(*ary, :gtr)
@@ -172,8 +173,8 @@ module MedGen
         "    mo:stt mo:#{stt} ;\n" <<
         "    mo:ispref ispref:#{ispref} ;\n" <<
         "    mo:aui \"#{aui}\" ;\n" <<
-        "    dct:source mo:#{sab.remove_space} ;\n" <<
-        "    mo:supress mo:#{supress}\n"
+        "    dct:source mo:#{sab.remove_space} ;\n"
+##        "    mo:supress mo:#{supress} ;\n"
 
       case flag
       when :hpo
@@ -197,6 +198,7 @@ module MedGen
       end
 
       turtle_ary << 
+        "    mo:supress mo:#{supress}\n" <<
         "  ] .\n" <<
         "\n"
 
@@ -370,6 +372,46 @@ module MedGen
         "  dct:references #{pmids.join(', ')} .\n\n"
     end
   end
+
+  class MedGenOMIMHPOMapping
+
+    def self.rdf(file)
+      File.open(file) do |f|
+        f.gets
+        MedGen.prefixes if $prefixes
+        while line = f.gets
+          ary = parse(line)
+          puts construct_turtle(*ary)
+        end
+      end
+    end
+
+    def self.parse(line)
+      ary = line.chomp.split("|")
+      if ary.size != 10
+        STDERR.print "#{line}"
+        raise "Parse error on MedGen_HPO_OMIM_Mapping.txt .\n"
+      end
+      ary
+    end
+
+    def self.construct_turtle(omim_cui, mim_number, omim_name, relationship,
+                              hpo_cui, hpo_id, hpo_name, medgen_name,
+                              medgen_source, sty)
+      turtle_str = ""
+
+      case relationship
+      when 'inheritance_type_of'
+        turtle_str = turtle_str +
+          "medgen:#{omim_cui} mo:#{relationship} obo:HP_#{hpo_id[3..-1]} .\n"
+      when ''
+      else
+        turtle_str = turtle_str +
+          "medgen:#{omim_cui} mo:#{relationship} obo:HP_#{hpo_id[3..-1]} .\n"
+      end
+      turtle_str
+    end
+  end
 end
 
 class String
@@ -397,7 +439,7 @@ def help
   print "  -h, --help     print help\n"
 end
 
-params = ARGV.getopts('ha:c:d:n:r:s:pu:', 'help', 'prefixes', 'names:', 'mgdef:', 'mgsty:', 'mgconso:', 'mgrel:', 'mgsat:', 'pubmed:')
+params = ARGV.getopts('ha:c:d:n:r:s:pu:m:', 'help', 'prefixes', 'names:', 'mgdef:', 'mgsty:', 'mgconso:', 'mgrel:', 'mgsat:', 'pubmed:', 'omim:')
 
 if params["help"] || params["h"]
   help
@@ -420,3 +462,7 @@ MedGen::MGSAT.rdf(params["mgsat"])         if params["mgsat"]
 MedGen::MGSAT.rdf(params["a"])             if params["a"]
 MedGen::MedGenPubMed.rdf(params["pubmed"]) if params["pubmed"]
 MedGen::MedGenPubMed.rdf(params["u"])      if params["u"]
+MedGen::MedGenOMIMHPOMapping.rdf(params["omim"]) if params["omim"]
+MedGen::MedGenOMIMHPOMapping.rdf(params["m"])    if params["m"]
+
+
