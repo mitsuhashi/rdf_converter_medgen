@@ -22,7 +22,8 @@ module MedGen
     "dct" => "<http://purl.org/dc/terms/>",
     "pubmedid" => "<http://identifiers.org/pubmed/>",
     "pubmed" => "<http://rdf.ncbi.nlm.nih.gov/pubmed/>",
-    "snomedct" => "<http://purl.bioontology.org/ontology/SNOMEDCT/>"
+    "snomedct" => "<http://purl.bioontology.org/ontology/SNOMEDCT/>",
+    "ncbigene" => "<http://identifiers.org/ncbigene/>"
   }
 
   def prefixes
@@ -375,13 +376,14 @@ module MedGen
 
   class MedGenOMIMHPOMapping
 
-    def self.rdf(file)
+    def self.rdf(file, sty_file)
+      sty_label2id = parse_umls_semantictype(sty_file)
       File.open(file) do |f|
         f.gets
         MedGen.prefixes if $prefixes
         while line = f.gets
           ary = parse(line)
-          puts construct_turtle(*ary)
+          puts construct_turtle(*ary, sty_label2id)
         end
       end
     end
@@ -395,24 +397,112 @@ module MedGen
       ary
     end
 
+    def self.parse_umls_semantictype(sty_file)
+      sty_label2id = {}
+      sty_id = ""
+      sty_label = ""
+      File.open(sty_file) do |f|
+        while line = f.gets
+          if /\/(\w+)\> a owl\:Class/ =~ line
+            sty_id = $1
+          elsif /skos\:prefLabel\s+\"(.+)\"\@en/ =~ line
+            sty_label = $1
+            sty_label2id[sty_label] = sty_id
+          else
+          end
+        end
+      end
+      sty_label2id
+    end
+
     def self.construct_turtle(omim_cui, mim_number, omim_name, relationship,
                               hpo_cui, hpo_id, hpo_name, medgen_name,
-                              medgen_source, sty)
+                              medgen_source, sty, sty_label2id)
       turtle_str = ""
-
-      case relationship
-      when 'inheritance_type_of'
+      if relationship == ""
+        turtle_str =
+          "medgen:#{hpo_cui} mo:undefined_relationship medgen:#{omim_cui} .\n"
+      else
+        turtle_str =
+          "medgen:#{hpo_cui} mo:#{relationship} medgen:#{omim_cui} .\n"
+      end
+      turtle_str = turtle_str +
+        "[\n" +
+        "  a rdf:Statement ;\n" +
+        "  rdf:subject medgen:#{hpo_cui} ;\n"
+      if relationship == ""
         turtle_str = turtle_str +
-          "medgen:#{omim_cui} mo:#{relationship} obo:HP_#{hpo_id[3..-1]} .\n"
-      when ''
+          "  rdf:predicate mo:undefined_relationship ;\n"
       else
         turtle_str = turtle_str +
-          "medgen:#{omim_cui} mo:#{relationship} obo:HP_#{hpo_id[3..-1]} .\n"
+          "  rdf:predicate mo:#{relationship} ;\n"
+      end
+      turtle_str = turtle_str +
+        "  rdf:object medgen:#{omim_cui} ;\n" +
+        "  dct:source mo:#{medgen_source} ;\n" +
+        "  mo:sty sty:#{sty_label2id[sty]}\n" +
+        "] .\n\n"
+
+      turtle_str
+    end
+  end
+
+  class MIM2GENE
+
+    def self.rdf(file)
+      File.open(file) do |f|
+        f.gets
+        MedGen.prefixes if $prefixes
+        while line = f.gets
+          ary = parse(line)
+          rdf_str = construct_turtle(*ary)
+          puts rdf_str unless rdf_str == ""
+        end
+      end
+    end
+
+    def self.parse(line)
+      ary = line.chomp.split("\t")
+      if ary.size != 6
+        STDERR.print "#{line}"
+        raise "Parse error on mim2gene_medgen.\n"
+      end
+      ary
+    end
+
+    def self.construct_turtle(mim_number,
+                              gene_id,
+                              type,       # 'gene' or 'phenotype'
+                              source,     # 'GeneMap', 'GeneReviews', 'GeneTests', 
+                                          # 'NCBI curation', 'OMIM'
+                              medgen_cui,
+                              comment) 
+      sources = ""
+      if source == "-"
+        sources = "-"
+      else
+        sources = source.strip.split("; ").map{|e| "\"#{e}\""}.join(", ")
+      end
+      turtle_str = ""
+      if type == "phenotype"
+        unless gene_id == '-' 
+          turtle_str =
+            "ncbigene:#{gene_id} obo:RO_0003302 medgen:#{medgen_cui} .\n" +
+            "[\n" +
+            "  rdf:subject ncbigene:#{gene_id} ;\n" +
+            "  rdf:predicate obo:RO_0003302 ;\n" +
+            "  rdf:object medgen:#{medgen_cui} ;\n" +
+            "  dct:source #{sources} ;\n" +
+            "  rdfs:comment \"#{comment}\" ;\n" +
+            "  a rdf:Statement\n" +
+            "] .\n\n"
+        end
       end
       turtle_str
     end
   end
 end
+
 
 class String
   def to_snake
@@ -436,10 +526,13 @@ def help
   print "  -r, --mgrel    convert MGREL_1.csv and MGREL_2.csv to RDF\n"
   print "  -a, --mgsat    convert MGSAT_1.csv and MGSAT_2.csv to RDF\n"
   print "  -u, --pubmed   convert medgen_pubmed_lnk.txt to RDF\n"
+  print "  -m, --omim     convert MedGen_HPO_OMIM_Mapping.txt to RDF\n"
+  print "  -l, --sty      UMLS Semantic Type Ontology\n"
+  print "  -g, --gene     convert omim2gene_medgen to RDF\n"
   print "  -h, --help     print help\n"
 end
 
-params = ARGV.getopts('ha:c:d:n:r:s:pu:m:', 'help', 'prefixes', 'names:', 'mgdef:', 'mgsty:', 'mgconso:', 'mgrel:', 'mgsat:', 'pubmed:', 'omim:')
+params = ARGV.getopts('ha:c:d:n:r:s:pu:m:l:g:', 'help', 'prefixes', 'names:', 'mgdef:', 'mgsty:', 'mgconso:', 'mgrel:', 'mgsat:', 'pubmed:', 'omim:', 'sty:', 'gene:')
 
 if params["help"] || params["h"]
   help
@@ -462,7 +555,19 @@ MedGen::MGSAT.rdf(params["mgsat"])         if params["mgsat"]
 MedGen::MGSAT.rdf(params["a"])             if params["a"]
 MedGen::MedGenPubMed.rdf(params["pubmed"]) if params["pubmed"]
 MedGen::MedGenPubMed.rdf(params["u"])      if params["u"]
-MedGen::MedGenOMIMHPOMapping.rdf(params["omim"]) if params["omim"]
-MedGen::MedGenOMIMHPOMapping.rdf(params["m"])    if params["m"]
-
-
+if params["m"] || params["omim"]
+  if params["m"] && params["l"]
+    MedGen::MedGenOMIMHPOMapping.rdf(params["m"], params["l"])
+  elsif params["m"] && params["sty"]
+    MedGen::MedGenOMIMHPOMapping.rdf(params["m"], params["sty"])
+  elsif params["omim"] && params["l"]
+    MedGen::MedGenOMIMHPOMapping.rdf(params["omim"], params["sty"])
+  elsif params["omim"] && params["sty"]
+    MedGen::MedGenOMIMHPOMapping.rdf(params["omim"], params["sty"])
+  else
+    help
+    exit
+  end
+end
+MedGen::MIM2GENE.rdf(params["gene"])       if params["gene"]
+MedGen::MIM2GENE.rdf(params["g"])          if params["g"]
