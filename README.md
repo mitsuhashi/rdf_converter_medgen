@@ -24,7 +24,7 @@ Semantic Types Ontology is available at [here](https://bioportal.bioontology.org
        -l, --sty     UMLS Semantic Type Ontology"
        -g, --gene    convert omim2gene_medgen to RDF"
        -h, --help print help\n"
-end
+
 
     All options otherwise -p, -m, -l can be set exclusively. Only -p option can be used with other option. The -m and -l options must be specified in pairs.
 
