@@ -23,7 +23,8 @@ module MedGen
     "pubmedid" => "<http://identifiers.org/pubmed/>",
     "pubmed" => "<http://rdf.ncbi.nlm.nih.gov/pubmed/>",
     "snomedct" => "<http://purl.bioontology.org/ontology/SNOMEDCT/>",
-    "ncbigene" => "<http://identifiers.org/ncbigene/>"
+    "ncbigene" => "<http://identifiers.org/ncbigene/>",
+    "bp_omim" => "<http://purl.bioontology.org/ontology/OMIM/>"
   }
 
   def prefixes
@@ -185,7 +186,14 @@ module MedGen
       when :msh
         turtle_ary << "    rdfs:seeAlso mesh:#{sdui} ;\n"
       when :omim
-        turtle_ary << "    rdfs:seeAlso omim:#{sdui} ;\n"
+        if /^[\d\.]+$/ =~ sdui
+          turtle_ary << "    rdfs:seeAlso omim:#{sdui} ;\n"
+        elsif /MTHU/ =~ sdui
+          turtle_ary << "    rdfs:seeAlso bp_omim:#{sdui} ;\n"
+        else
+          STDERR.print "#{sdui} Unknown OMIM ID pattern.\n"
+          exit
+        end
       when :ordo
         turtle_ary << "    rdfs:seeAlso ordo:#{sdui} ;\n"
       when :nci
