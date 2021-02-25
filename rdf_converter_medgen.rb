@@ -14,7 +14,7 @@ module MedGen
     "mo" => "<http://med2rdf/ontology/medgen#>",
     "ispref" => "<http://med2rdf/ontology/medgen/ispref#>",
     "sty" => "<http://purl.bioontology.org/ontology/STY/>",
-    "omim" => "<http://purl.bioontology.org/ontology/OMIM/>",
+    "omim" => "<http://identifiers.org/omim/>",
     "obo" => "<http://purl.obolibrary.org/obo/>",
     "mesh" => "<http://id.nlm.nih.gov/mesh/>",
     "ordo" => "<http://www.orpha.net/ORDO/>",
@@ -186,8 +186,10 @@ module MedGen
       when :msh
         turtle_ary << "    rdfs:seeAlso mesh:#{sdui} ;\n"
       when :omim
-        if /^[\d\.]+$/ =~ sdui
+        if /^\d+$/ =~ sdui
           turtle_ary << "    rdfs:seeAlso omim:#{sdui} ;\n"
+        elsif /^(\d+)\.\d+$/ =~ sdui
+          turtle_ary << "    rdfs:seeAlso omim:#{$1} ;\n"
         elsif /MTHU/ =~ sdui
           turtle_ary << "    rdfs:seeAlso bp_omim:#{sdui} ;\n"
         else
