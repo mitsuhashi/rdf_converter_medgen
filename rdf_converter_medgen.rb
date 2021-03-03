@@ -203,7 +203,9 @@ module MedGen
       when :snomedct_us
         turtle_ary << "    rdfs:seeAlso snomedct:#{scui} ;\n"
       when :mondo
-        turtle_ary << "    rdfs:seeAlso obo:#{code} ;\n"
+        /MONDO\:(\d+)/ =~ sdui
+        mondo_id = $1
+        turtle_ary << "    rdfs:seeAlso obo:MONDO_#{$1} ;\n"
       when :other
       else
       end
