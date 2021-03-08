@@ -14,7 +14,7 @@ module MedGen
     "mo" => "<http://med2rdf/ontology/medgen#>",
     "ispref" => "<http://med2rdf/ontology/medgen/ispref#>",
     "sty" => "<http://purl.bioontology.org/ontology/STY/>",
-    "omim" => "<http://identifiers.org/omim/>",
+    "omim" => "<http://identifiers.org/mim/>",
     "obo" => "<http://purl.obolibrary.org/obo/>",
     "mesh" => "<http://id.nlm.nih.gov/mesh/>",
     "ordo" => "<http://www.orpha.net/ORDO/>",
@@ -461,6 +461,8 @@ module MedGen
 
   class MIM2GENE
 
+    @@mim2type = {}
+
     def self.rdf(file)
       File.open(file) do |f|
         f.gets
@@ -470,6 +472,9 @@ module MedGen
           rdf_str = construct_turtle(*ary)
           puts rdf_str unless rdf_str == ""
         end
+      end
+      @@mim2type.each do |mim_number, mim_type|
+        puts "omim:#{mim_number} mo:mim_type \"#{mim_type}\" . \n\n"
       end
     end
 
@@ -495,10 +500,13 @@ module MedGen
       else
         sources = source.strip.split("; ").map{|e| "\"#{e}\""}.join(", ")
       end
+
       turtle_str = ""
       if type == "phenotype"
-        unless gene_id == '-' 
+        @@mim2type[mim_number] ||= "phenotype"
+        unless gene_id == '-'
           turtle_str =
+            # obo:RO_0003302 "causes or contributes to condition"
             "ncbigene:#{gene_id} obo:RO_0003302 medgen:#{medgen_cui} .\n" +
             "[\n" +
             "  rdf:subject ncbigene:#{gene_id} ;\n" +
@@ -509,6 +517,10 @@ module MedGen
             "  a rdf:Statement\n" +
             "] .\n\n"
         end
+      elsif type == "gene"
+        @@mim2type[mim_number] ||= "gene"
+        turtle_str = 
+          "ncbigene:#{gene_id} rdfs:seeAlso omim:#{mim_number} .\n\n"
       end
       turtle_str
     end
