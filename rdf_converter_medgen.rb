@@ -519,8 +519,10 @@ module MedGen
         end
       elsif type == "gene"
         @@mim2type[mim_number] ||= "gene"
-        turtle_str = 
-          "ncbigene:#{gene_id} rdfs:seeAlso omim:#{mim_number} .\n\n"
+        unless gene_id == '-'
+          turtle_str = 
+            "ncbigene:#{gene_id} rdfs:seeAlso omim:#{mim_number} .\n\n"
+        end
       end
       turtle_str
     end
