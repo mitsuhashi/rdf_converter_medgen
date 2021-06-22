@@ -395,14 +395,14 @@ module MedGen
         MedGen.prefixes if $prefixes
         while line = f.gets
           ary = parse(line)
-          puts construct_turtle(*ary, sty_label2id)
+          puts construct_turtle(*ary[0..9], sty_label2id)
         end
       end
     end
 
     def self.parse(line)
-      ary = line.chomp.split("|")
-      if ary.size != 10
+      ary = line.split("|", -1)
+      if ary.size < 10
         STDERR.print "#{line}"
         raise "Parse error on MedGen_HPO_OMIM_Mapping.txt .\n"
       end
