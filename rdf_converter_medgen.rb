@@ -368,7 +368,8 @@ module MedGen
     end
 
     def self.parse(line)
-      if /^(\d+)\|(\w+)\|(.+)\|(\d+)\|[\r\n]*?$/ =~ line
+      line_replaced = line.force_encoding('UTF-8').scrub('?')
+      if /^(\d+)\|(\w+)\|(.+)\|(\d+)\|[\r\n]*?$/ =~ line_replaced
         [$1, $2, $3, $4]
       else
         raise "Parse error on medgen_pubmed_lnk.txt .\n"
