@@ -43,6 +43,7 @@ module MedGen
         f.gets
         MedGen.prefixes if $prefixes
         while line = f.gets
+          next if /^[\r\n]+$/ =~ line
           ary = parse(line)
           puts construct_turtle(*ary)
         end
@@ -57,7 +58,7 @@ module MedGen
       elsif /^(\S+),(.+)[\r\n]*?$/ =~ line
         [$1, $2, "Unknown", "Unknown"]
       else
-        raise "Parse error on NAMES.\n"
+        raise "Parse error on NAMES for " + line + ".\n"
       end
     end
 
@@ -87,6 +88,7 @@ module MedGen
         f.gets
         MedGen.prefixes if $prefixes
         while line = f.gets
+          next if /^[\r\n]+$/ =~ line
           ary = parse(line)
           puts construct_turtle(*ary)
         end
@@ -97,7 +99,7 @@ module MedGen
       if /^(\w+),\"(.+)\",(.+?),(\w)[\r\n]+?$/ =~ line
         [$1, $2, $3, $4]
       else
-        raise "Parse error on MGDEF.\n"
+        raise "Parse error on MGDEF for " + line + ".\n"
       end 
     end
 
@@ -124,6 +126,7 @@ module MedGen
         f.gets
         MedGen.prefixes if $prefixes
         while line = f.gets
+          next if /^[\r\n]+$/ =~ line
           ary = parse(line)
           # ary[8] describes an abbreviation for the source of the term
           # (Defined in MedGen_Sources.txt)
@@ -160,7 +163,7 @@ module MedGen
       elsif /^(\w+),(\w+),(\w+),(\w+),(\w+),(\S*),(\S*),(\S*),(\w+),(\w+),(.?),\"\",\w[\r\n]+$/ =~ line
         [$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, "", "N"]
       else
-        raise "Parse error on MGCONSO.\n"
+        raise "Parse error on MGCONSO for " + line + ".\n"
       end
     end
 
@@ -226,6 +229,7 @@ module MedGen
         f.gets
         MedGen.prefixes if $prefixes
         while line = f.gets
+          next if /^[\r\n]+$/ =~ line
           ary = parse(line)
           puts construct_turtle(*ary)
         end
@@ -236,7 +240,7 @@ module MedGen
       if /^(\w+),(\w+),.+,(\w+)[\r\n]*?$/ =~ line
         [$1, $2, $13]
       else
-        raise "Parse error on MGSTY.\n"
+        raise "Parse error on MGSTY for " + line + ".\n"
       end
     end
 
@@ -258,6 +262,7 @@ module MedGen
         f.gets
         MedGen.prefixes if $prefixes
         while line = f.gets
+          next if /^[\r\n]+$/ =~ line
           ary = parse(line)
           puts construct_turtle(*ary)
         end
@@ -268,7 +273,7 @@ module MedGen
       if /^(\w+),(\w+),(\w+),(\w+),(\w+),(\w+),(\w*),(\w+),(\w+),(\w+),(\w)[\r\n]*?$/ =~ line
         [$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11]
       else
-        raise "Parse error on MGREL.\n"
+        raise "Parse error on MGREL for " + line + "\n"
       end
     end
 
@@ -306,6 +311,7 @@ module MedGen
         f.gets
         MedGen.prefixes if $prefixes
         while line = f.gets
+          next if /^[\r\n]+$/ =~ line
           ary = parse(line)
           puts construct_turtle(*ary)
         end
@@ -316,7 +322,7 @@ module MedGen
       if /^(\w+),(\w+),(\w+),([\.\:\w]*),(\w+),([\w\-\_]+),(\w+),\"(.*)\",(\w)[\r\n]*?$/ =~ line
         [$1, $2, $3, $4, $5, $6, $7, $8, $9]
       else
-        raise "Parse error on MGSAT.\n"
+        raise "Parse error on MGSAT for " + line + ".\n"
       end
     end
 
@@ -369,10 +375,10 @@ module MedGen
 
     def self.parse(line)
       line_replaced = line.force_encoding('UTF-8').scrub('?')
-      if /^(\d+)\|(\w+)\|(.+)\|(\d+)\|[\r\n]*?$/ =~ line_replaced
+      if /^(\d+)\|(\w+)\|(.+)\|(\d+)\|?[\r\n]*?$/ =~ line_replaced
         [$1, $2, $3, $4]
       else
-        raise "Parse error on medgen_pubmed_lnk.txt .\n"
+        raise "Parse error on medgen_pubmed_lnk.txt for " + line_replaced + "\n"
       end
     end
 
