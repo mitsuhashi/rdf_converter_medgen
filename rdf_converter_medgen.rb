@@ -313,7 +313,7 @@ module MedGen
     end
 
     def self.parse(line)
-      if /^(\w+),(\w+),(\w+),([\:\w]*),(\w+),([\w\-\_]+),(\w+),\"(.*)\",(\w)[\r\n]*?$/ =~ line
+      if /^(\w+),(\w+),(\w+),([\.\:\w]*),(\w+),([\w\-\_]+),(\w+),\"(.*)\",(\w)[\r\n]*?$/ =~ line
         [$1, $2, $3, $4, $5, $6, $7, $8, $9]
       else
         raise "Parse error on MGSAT.\n"
