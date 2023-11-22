@@ -50,7 +50,9 @@ module MedGen
     end
 
     def self.parse(line)
-      if  /^(\S+),\"(.+)\",(.+),(\w)[\r\n]*?$/ =~ line
+      if  /^(\S+),([^\".]+),(.+),(\w)[\r\n]*?$/ =~ line
+        [$1, $2, $3, $4]
+      elsif  /^(\S+),\"(.+)\",(.+),(\w)[\r\n]*?$/ =~ line
         [$1, $2, $3, $4]
       elsif /^(\S+),\"(.+)[\r\n]*?$/ =~ line
         [$1, $2, "Unknown", "Unknown"]
