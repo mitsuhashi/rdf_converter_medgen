@@ -61,7 +61,7 @@ module MedGen
       end
     end
 
-    def self.construct_turtle(cui, name, source, supress)
+    def self.construct_turtle(cui, name, source, suppress)
       turtle_str = ""
       turtle_str = turtle_str +
         "medgen:#{cui}\n" +
@@ -71,7 +71,7 @@ module MedGen
         "  mo:name [\n" +
         "    rdfs:label \"#{name.gsub('"','\"').gsub("\r","").gsub("\n","")}\" ;\n" +
         "    dct:source mo:#{source.remove_space} ;\n" +
-        "    mo:supress mo:#{supress}\n" +
+        "    mo:suppress mo:#{suppress}\n" +
         "  ] .\n" +
         "\n"
       turtle_str
@@ -101,7 +101,7 @@ module MedGen
       end 
     end
 
-    def self.construct_turtle(cui, c_def, source, supress)
+    def self.construct_turtle(cui, c_def, source, suppress)
       turtle_str = ""
       turtle_str = turtle_str + 
         "medgen:#{cui}\n" +
@@ -109,7 +109,7 @@ module MedGen
         "  mo:mgdef [\n" +
         "    skos:definition \"#{c_def.gsub("\r"," ").gsub("\n","").gsub(/\\/,"\\\\\\\\").gsub('"','\"')}\" ;\n" +
         "    dct:source mo:#{source.remove_space} ;\n" +
-        "    mo:supress mo:#{supress}\n" +
+        "    mo:suppress mo:#{suppress}\n" +
         "  ] .\n" +
         "\n"
       turtle_str
@@ -165,7 +165,7 @@ module MedGen
     end
 
     def self.construct_turtle(cui, ts, stt, ispref, aui, saui,
-                              scui, sdui, sab, tty, code, str, supress, flag)
+                              scui, sdui, sab, tty, code, str, suppress, flag)
       turtle_ary = ["medgen:#{cui}\n"]
 
       turtle_ary << 
@@ -176,7 +176,7 @@ module MedGen
         "    mo:ispref ispref:#{ispref} ;\n" <<
         "    mo:aui \"#{aui}\" ;\n" <<
         "    dct:source mo:#{sab.remove_space} ;\n"
-##        "    mo:supress mo:#{supress} ;\n"
+##        "    mo:suppress mo:#{suppress} ;\n"
 
       case flag
       when :hpo
@@ -211,7 +211,7 @@ module MedGen
       end
 
       turtle_ary << 
-        "    mo:supress mo:#{supress}\n" <<
+        "    mo:suppress mo:#{suppress}\n" <<
         "  ] .\n" <<
         "\n"
 
@@ -273,7 +273,7 @@ module MedGen
     end
 
     def self.construct_turtle(cui1, aui1, stype1, rel, cui2, aui2, rela,
-                              rui, sab, sl, supress)
+                              rui, sab, sl, suppress)
       turtle_str = 
         "[\n" +
         "  a mo:MGREL ;\n" +
@@ -285,13 +285,13 @@ module MedGen
       if rela == ""
         turtle_str = turtle_str +
           "  dct:source mo:#{sab} ;\n" +
-          "  mo:supress mo:#{supress}\n" +
+          "  mo:suppress mo:#{suppress}\n" +
           "] .\n\n"
       else
         turtle_str = turtle_str + 
           "  mo:rela \"#{rela}\" ;\n" +
           "  dct:source mo:#{sab} ;\n" +
-          "  mo:supress mo:#{supress}\n" +
+          "  mo:suppress mo:#{suppress}\n" +
           "] .\n\n"
       end
       turtle_str
@@ -321,7 +321,7 @@ module MedGen
     end
 
     def self.construct_turtle(cui, metaui, stype, code, atui, atn,
-                              sab, atv, supress)
+                              sab, atv, suppress)
       turtle_str = ""
       turtle_str = turtle_str +
         "medgen:#{cui}\n" +
@@ -333,7 +333,7 @@ module MedGen
         "    rdfs:label \"#{atn}\" ;\n" +
         "    rdf:value \"#{atv.gsub("\\","").gsub('"', '\"')}\" ;\n" +
         "    dct:source mo:#{sab} ;\n" +
-        "    mo:supress mo:#{supress}\n" +
+        "    mo:suppress mo:#{suppress}\n" +
         "  ] .\n\n"
       turtle_str
     end
