@@ -137,7 +137,6 @@ module MedGen
         f.gets
         MedGen.prefixes if $prefixes
         while line = f.gets
-          p line
           ary = parse(line)
           # ary[8] describes an abbreviation for the source of the term
           # (Defined in MedGen_Sources.txt)
@@ -329,7 +328,9 @@ module MedGen
     end
 
     def self.parse(line)
-      if /^(\w+),(\w+),(\w+),([\:\w]*),(\w+),([\w\-\_]+),(\w+),\"(.*)\",(\w)[\r\n]*?$/ =~ line
+      if /^(\w+),(\w+),(\w+),([\.\:\w]*),(\w+),([\w\-\_]+),(\w+),\"(.*)\",(\w)[\r\n]*?$/ =~ line
+        [$1, $2, $3, $4, $5, $6, $7, $8, $9]
+      elsif /^(\w+),(\w+),(\w+),([\.\:\w]*),(\w+),([\w\-\_]+),(\w+),(.*),(\w)[\r\n]*?$/ =~ line
         [$1, $2, $3, $4, $5, $6, $7, $8, $9]
       else
         raise "Parse error on MGSAT.\n"
