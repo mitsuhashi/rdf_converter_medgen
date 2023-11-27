@@ -50,7 +50,7 @@ module MedGen
     end
 
     def self.parse(line)
-      if  /^(\S+),([^\".]+),(.+),(\w)[\r\n]*?$/ =~ line
+      if /^(\S+),([^\".]+),(.+),(\w)[\r\n]*?$/ =~ line
         [$1, $2, $3, $4]
       elsif  /^(\S+),\"(.+)\",(.+),(\w)[\r\n]*?$/ =~ line
         [$1, $2, $3, $4]
@@ -90,16 +90,27 @@ module MedGen
         MedGen.prefixes if $prefixes
         while line = f.gets
           ary = parse(line)
-          puts construct_turtle(*ary)
+          puts construct_turtle(*ary) unless ary == "NA"
         end
       end
     end
 
     def self.parse(line)
-      if /^(\w+),\"(.+)\",(.+?),(\w)[\r\n]+?$/ =~ line
+      if /^(\w+),\"(.+)\",([\w\s]+?),(\w)[\r\n]+?$/ =~ line
+        STDERR.print "#{$3}\n"
+        [$1, $2, $3, $4]
+      elsif /^(\w+),(.+),([\w\s]+?),(\w)[\r\n]+?$/ =~ line
+        STDERR.print "#{$3}\n"
+        [$1, $2, $3, $4]
+      elsif /^(\w+),([.\\]+),([\w\s]+?),(\w)[\r\n]+?$/ =~ line
+        STDERR.print "#{$3}\n"
         [$1, $2, $3, $4]
       else
-        raise "Parse error on MGDEF.\n"
+        begin
+          raise "Parse error on MGDEF.\n"
+        rescue
+          return "NA"
+        end
       end 
     end
 
@@ -126,6 +137,7 @@ module MedGen
         f.gets
         MedGen.prefixes if $prefixes
         while line = f.gets
+          p line
           ary = parse(line)
           # ary[8] describes an abbreviation for the source of the term
           # (Defined in MedGen_Sources.txt)
@@ -161,6 +173,8 @@ module MedGen
         [$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, "N"]
       elsif /^(\w+),(\w+),(\w+),(\w+),(\w+),(\S*),(\S*),(\S*),(\w+),(\w+),(.?),\"\",\w[\r\n]+$/ =~ line
         [$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, "", "N"]
+      elsif /^(\w+),(\w+),(\w+),(\w+),(\w+),(\S*),(\S*),(\S*),(\w+),(\w+),(.+?),(.+),\w[\r\n]+$/ =~ line
+        [$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, "N"]
       else
         raise "Parse error on MGCONSO.\n"
       end
