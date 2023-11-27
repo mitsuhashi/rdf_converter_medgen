@@ -97,13 +97,13 @@ module MedGen
 
     def self.parse(line)
       if /^(\w+),\"(.+)\",([\w\s]+?),(\w)[\r\n]+?$/ =~ line
-        STDERR.print "#{$3}\n"
+#        STDERR.print "#{$3}\n"
         [$1, $2, $3, $4]
       elsif /^(\w+),(.+),([\w\s]+?),(\w)[\r\n]+?$/ =~ line
-        STDERR.print "#{$3}\n"
+#        STDERR.print "#{$3}\n"
         [$1, $2, $3, $4]
       elsif /^(\w+),([.\\]+),([\w\s]+?),(\w)[\r\n]+?$/ =~ line
-        STDERR.print "#{$3}\n"
+#        STDERR.print "#{$3}\n"
         [$1, $2, $3, $4]
       else
         begin
